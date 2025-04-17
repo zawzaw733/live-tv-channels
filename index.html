@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live TV Channels</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .channel-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .channel-list li {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .channel-list li:hover {
+            background-color: #0056b3;
+        }
+
+        .channel-list li:active {
+            background-color: #003d80;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+
+            .channel-list li {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live TV Channels</h1>
+        <ul id="channel-list" class="channel-list">
+            <!-- Channels will be added dynamically by JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // Manifest data as a JavaScript object
+        const manifestData = {
+            "name": "Live TV Channels",
+            "short_name": "Live TV",
+            "start_url": window.location.href,
+            "display": "standalone",
+            "background_color": "#f4f4f4",
+            "theme_color": "#007bff",
+            "icons": [
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/128/2989/2989726.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/2989/2989726.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+
+        // Inject manifest into the page
+        const manifestString = JSON.stringify(manifestData);
+        const manifestBlob = new Blob([manifestString], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+
+        // Service Worker code embedded
+        const serviceWorkerCode = `
+            self.addEventListener('install', (event) => {
+                console.log('Service Worker installed');
+            });
+
+            self.addEventListener('fetch', (event) => {
+                event.respondWith(fetch(event.request));
+            });
+        `;
+
+        // Register Service Worker dynamically
+        if ('serviceWorker' in navigator) {
+            const scriptBlob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
+            const scriptURL = URL.createObjectURL(scriptBlob);
+            navigator.serviceWorker.register(scriptURL)
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+
+        // m3u playlist data
+        const channels = [
+            { name: "Mahar", url: "https://tv.mahar.live/mahar/website.stream/mahar/website1/chunks.m3u8" },
+            { name: "5Plus", url: "https://5a13fe32ef748.streamlock.net/mmplay/5plus/chunklist_w1869259503.m3u8" },
+            { name: "Channel K", url: "https://l1-xl1.myanmarnet.com/relay/channelk/ch1/stream.m3u8" },
+            { name: "Channel 7", url: "https://pplive.comquas.com:5443/LiveApp/streams/CLcBFN71NkF61709008601656.m3u8" },
+            { name: "Bawdi", url: "https://pplive.comquas.com:5443/LiveApp/streams/rHEBIW7pjQLU1677679374164.m3u8" },
+            { name: "MNTV", url: "https://l1-xl1.myanmarnet.com/relay/mntv/ch1/stream.m3u8" },
+            { name: "Mahar Sports", url: "https://tv.mahar.live/esports/mahar.stream/esports/mahar2/chunks.m3u8" },
+            { name: "MITV", url: "https://l1-xl1.myanmarnet.com/relay/mitv/ch1/stream.m3u8" },
+            { name: "Fourtube", url: "http://103.215.194.93:8282/hls/fortunetv/live/vmix_1080.m3u8" },
+            { name: "Channel ME", url: "https://5a13fe32ef748.streamlock.net/mmplay/mrtv-entertainment/playlist.m3u8" },
+            { name: "Music", url: "https://l1-xl1.myanmarnet.com/relay/music/ch1/stream_hi/index.m3u8" },
+            { name: "MSC", url: "https://l1-xl1.myanmarnet.com/relay2/mcs/ch1/stream_hi/index.m3u8" },
+            { name: "MVM", url: "https://edge6a.v2h-cdn.com/mvm/mvm.stream/playlist.m3u8" },
+            { name: "Golden Land", url: "http://203.81.84.130/hls/mwd_document/index.m3u8" },
+            { name: "TVM", url: "http://203.81.84.130/hls/mwd_serie/index.m3u8" },
+            { name: "VOA", url: "https://voa-ingest.akamaized.net/hls/live/2033872-b/tvmc05/playlist.m3u8" },
+            { name: "MRTV-4", url: "https://pplive.comquas.com:5443/LiveApp/streams/w3g3EYjBtqgJ1677679288037.m3u8" }
+        ];
+
+        // Function to populate the channel list
+        function populateChannelList() {
+            const channelList = document.getElementById("channel-list");
+            channels.forEach(channel => {
+                const li = document.createElement("li");
+                li.textContent = channel.name;
+                li.onclick = () => openInNetworkStreamPlayer(channel.url);
+                channelList.appendChild(li);
+            });
+        }
+
+        // Function to open the URL in Network Stream Video Player
+        function openInNetworkStreamPlayer(url) {
+            const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.genuine.leone;end`;
+            window.location.href = intentUrl;
+        }
+
+        // Populate the channel list immediately
+        populateChannelList();
+    </script>
+</body>
+</html>
